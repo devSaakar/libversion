@@ -1,41 +1,41 @@
-import { query } from "../db";
+import { getClient, query } from "../db";
 
 export const repositoryService = {
   async getAllUsers() {
     const res = await query("SELECT * FROM users");
-    return res.rows;
+    return res;
   },
   async getUserById(id: string) {
     const res = await query("SELECT * FROM users WHERE id = $1", [id]);
-    return res.rows[0];
+    return res[0];
   },
   async getAllRepositories() {
     const res = await query("SELECT * FROM repositories");
-    return res.rows;
+    return res;
   },
   async getRepositoryById(id: string) {
     const res = await query("SELECT * FROM repositories WHERE id = $1", [id]);
-    return res.rows[0];
+    return res[0];
   },
   async searchRepositoryByName(search: string) {
     const res = await query(
       "SELECT * FROM repositories WHERE LOWER(name) LIKE LOWER($1)",
       [`%${search}%`]
     );
-    return res.rows;
+    return res;
   },
   async getUserRepositoriesByUserId(user_id: string) {
     const res = await query(
       "SELECT * FROM user_repositories WHERE user_id = $1",
       [user_id]
     );
-    return res.rows;
+    return res;
   },
   async getUserRepositoryById(id: string) {
     const res = await query("SELECT * FROM user_repositories WHERE id = $1", [
       id,
     ]);
-    return res.rows[0];
+    return res[0];
   },
   async deleteRepository(id: string) {
     await query("DELETE FROM repositories WHERE id = $1", [id]);
@@ -52,9 +52,9 @@ export const repositoryService = {
       [name]
     );
 
-    if (existingRepo.rows.length > 0) {
+    if (existingRepo.length > 0) {
       // Return the existing repository if found
-      return existingRepo.rows[0];
+      return existingRepo[0];
     }
 
     // If repository doesn't exist, create a new one
@@ -62,7 +62,7 @@ export const repositoryService = {
       "INSERT INTO repositories (name, version, description, release_notes, status) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [name, version, description, releaseNotes, status || "ACTIVE"]
     );
-    return result.rows[0];
+    return result[0];
   },
   async addUserRepository(userRepo: any) {
     const { user_id, repository_id } = userRepo;
@@ -73,8 +73,8 @@ export const repositoryService = {
       [user_id, repository_id]
     );
 
-    if (existingRepo.rows.length > 0) {
-      return existingRepo.rows[0];
+    if (existingRepo.length > 0) {
+      return existingRepo[0];
     }
 
     // If repository doesn't exist, create a new one
@@ -82,7 +82,7 @@ export const repositoryService = {
       "INSERT INTO user_repositories (user_id,repository_id) VALUES ($1, $2) RETURNING *",
       [user_id, repository_id]
     );
-    return result.rows[0];
+    return result[0];
   },
   async removeUserRepository(userRepo: any) {
     const { user_id, repository_id } = userRepo;
@@ -93,7 +93,7 @@ export const repositoryService = {
       [user_id, repository_id]
     );
 
-    if (existingRepo.rows.length === 0) {
+    if (existingRepo.length === 0) {
       // If repository doesn't exist, return a message or null
       return { message: "Repository not found for this user" };
     }
@@ -105,7 +105,7 @@ export const repositoryService = {
     );
 
     // Return the deleted entry or any relevant information
-    return result.rows[0] || { message: "No rows affected" };
+    return result[0] || { message: "No rows affected" };
   },
   async addUser(user: any) {
     const { username } = user;
@@ -115,9 +115,9 @@ export const repositoryService = {
       [username]
     );
 
-    if (existingRepo.rows.length > 0) {
+    if (existingRepo.length > 0) {
       // Return the existing repository if found
-      return existingRepo.rows[0];
+      return existingRepo[0];
     }
 
     // If repository doesn't exist, create a new one
@@ -125,7 +125,7 @@ export const repositoryService = {
       "INSERT INTO users (username) VALUES ($1) RETURNING *",
       [username]
     );
-    return result.rows[0];
+    return result[0];
   },
   async updateRepository(id: string, edits: any) {
     const { name, version, description, releaseNotes, status } = edits;
@@ -133,10 +133,10 @@ export const repositoryService = {
       "UPDATE repositories SET name = $1, version = $2, description = $3, release_notes = $4, status = $5 WHERE id = $6 RETURNING *",
       [name, version, description, releaseNotes, status, id]
     );
-    return res.rows[0];
+    return res[0];
   },
   async getAllUserRepositories() {
     const res = await query("SELECT * FROM user_repositories");
-    return res.rows;
+    return res;
   },
 };

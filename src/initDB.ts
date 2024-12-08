@@ -1,15 +1,16 @@
 import { Pool } from "pg";
+import { getClient } from "./db";
 
 export const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT),
 });
 
 export const createTables = async () => {
-  const client = await pool.connect();
+  const client = await getClient();
   try {
     console.log("Checking and creating tables if not exist...");
 
@@ -49,6 +50,6 @@ export const createTables = async () => {
   } catch (error) {
     console.error("Error creating tables:", error);
   } finally {
-    client.release();
+    client.end();
   }
 };

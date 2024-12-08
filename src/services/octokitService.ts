@@ -1,146 +1,96 @@
-// import { graphql } from "@octokit/graphql";
-// import { graphql as gql } from "@octokit/graphql/dist-types/types";
+import { graphql } from "@octokit/graphql";
+import * as dotenv from "dotenv";
+import { Repository } from "../_db";
+dotenv.config();
 
-// import * as dotenv from "dotenv";
+const token = process.env.GITHUB_TOKEN;
 
-// dotenv.config();
+const octokit = (graphql as any).defaults({
+  headers: {
+    authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+  },
+});
 
-// const token = process.env.GITHUB_TOKEN;
-// console.log("token octokitService", token);
+const convertRepositoryData = (data: any, index: number): Repository => {
+  const { node } = data;
 
-// const octokit = (graphql as gql).defaults({
-//   headers: {
-//     authorization: `Bearer ${token}`,
-//   },
-// });
+  // Extracting relevant fields from the node object
+  const id = index + "";
+  const name = node.name;
+  const description = node.description;
+  const version =
+    node.releases.nodes.length > 0
+      ? node.releases.nodes[0].tagName // If releases exist, set version to the latest release's name
+      : "N/A"; // If no releases, set version to "N/A"
+  const releaseNotes =
+    node.releases.nodes.length > 0
+      ? node.releases.nodes[0].description || "No release notes available"
+      : "No release notes available"; // If no releases, set default release notes message
+  const status = "ACTIVE";
 
-// // Define a type for the GraphQL response
-// interface Release {
-//   name: string;
-//   tagName: string;
-//   description: string | null;
-//   publishedAt: string;
-// }
-
-// interface Ref {
-//   name: string;
-//   target: {
-//     committedDate: string;
-//   };
-// }
-
-// interface Repository {
-//   name: string;
-//   description: string | null;
-//   url: string;
-//   stargazerCount: number;
-//   forkCount: number;
-//   owner: {
-//     login: string;
-//   };
-//   createdAt: string;
-//   updatedAt: string;
-//   releases: {
-//     nodes: Release[];
-//   };
-//   refs: {
-//     nodes: Ref[];
-//   };
-// }
-
-// interface SearchResponse {
-//   search: {
-//     repositoryCount: number;
-//     edges: Array<{
-//       node: Repository;
-//     }>;
-//   };
-// }
-
-export const searchLibrary = (search: string) => {
-  search;
+  return { id, name, version, description, releaseNotes, status };
 };
 
-// export const searchLibrary = async (libraryName: string): Promise<void> => {
-//   const gqlQuery = `
-//     query($searchQuery: String!) {
-//       search(query: $searchQuery, type: REPOSITORY, first: 10) {
-//         repositoryCount
-//         edges {
-//           node {
-//             ... on Repository {
-//               name
-//               description
-//               url
-//               stargazerCount
-//               forkCount
-//               owner {
-//                 login
-//               }
-//               createdAt
-//               updatedAt
-//               releases(first: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
-//                 nodes {
-//                   name
-//                   tagName
-//                   description
-//                   publishedAt
-//                 }
-//               }
-//               refs(refPrefix: "refs/tags/", first: 1, orderBy: { field: TAG_COMMIT_DATE, direction: DESC }) {
-//                 nodes {
-//                   name
-//                   target {
-//                     ... on Commit {
-//                       committedDate
-//                     }
-//                   }
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-//     }
-//   `;
+export const searchLibrary = async (libraryName: string): Promise<any[]> => {
+  const gqlQuery = `
+    query($searchQuery: String!) {
+      search(query: $searchQuery, type: REPOSITORY, first: 5) {
+        repositoryCount
+        edges {
+          node {
+            ... on Repository {
+              name
+              description
+              url
+              stargazerCount
+              forkCount
+              owner {
+                login
+              }
+              createdAt
+              updatedAt
+              releases(first: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+                nodes {
+                  name
+                  tagName
+                  description
+                  publishedAt
+                }
+              }
+              refs(refPrefix: "refs/tags/", first: 1, orderBy: { field: TAG_COMMIT_DATE, direction: DESC }) {
+                nodes {
+                  name
+                  target {
+                    ... on Commit {
+                      committedDate
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
 
-//   try {
-//     const response: SearchResponse = await octokit(gqlQuery, {
-//       searchQuery: libraryName,
-//     });
+  try {
+    const client = await octokit;
+    const searchQuery = `${libraryName} sort:stars-desc`;
+    const response = await client(gqlQuery, { searchQuery });
 
-//     if (response.search.repositoryCount === 0) {
-//       console.log(`No repositories found for query: "${libraryName}"`);
-//       return;
-//     }
-
-//     const repo = response.search.edges[0].node;
-//     console.log(`Repository: ${repo.name} by ${repo.owner.login}`);
-//     console.log(`Description: ${repo.description || "No description"}`);
-//     console.log(`URL: ${repo.url}`);
-//     console.log(`Stars: ${repo.stargazerCount} | Forks: ${repo.forkCount}`);
-//     console.log(
-//       `Created At: ${repo.createdAt} | Updated At: ${repo.updatedAt}`
-//     );
-
-//     if (repo.releases.nodes.length > 0) {
-//       const latestRelease = repo.releases.nodes[0];
-//       console.log(`\nLatest Release: ${latestRelease.name || "Unnamed"}`);
-//       console.log(`Tag: ${latestRelease.tagName}`);
-//       console.log(`Published At: ${latestRelease.publishedAt}`);
-//       console.log(
-//         `Release Notes: ${
-//           latestRelease.description || "No release notes available."
-//         }`
-//       );
-//     } else if (repo.refs.nodes.length > 0) {
-//       const latestTag = repo.refs.nodes[0];
-//       console.log(`\nLatest Tag: ${latestTag.name}`);
-//       console.log(`Tag Commit Date: ${latestTag.target.committedDate}`);
-//     } else {
-//       console.log(`\nNo releases or tags found for this repository.`);
-//     }
-//   } catch (error: any) {
-//     console.error(`Error: ${error.message}`);
-//   }
-// };
+    if (response.search.repositoryCount === 0) {
+      console.log(`No repositories found for query: "${libraryName}"`);
+      return;
+    } else {
+      console.log(
+        "response.search.edges",
+        JSON.stringify(response.search.edges)
+      );
+      const repositories = response.search.edges.map(convertRepositoryData);
+      return repositories;
+    }
+  } catch (error: any) {
+    console.error(`Error: ${error.message}`);
+  }
+};

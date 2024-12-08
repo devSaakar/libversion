@@ -1,18 +1,26 @@
-import { Pool } from "pg";
+import { Client, QueryResult } from "pg";
 import dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config();
 
-// PostgreSQL connection pool
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || "5432"),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
-
-export const query = (text: string, params?: any[]) => {
-  return pool.query(text, params);
-};
+export async function getClient() {
+  const client = new Client(process.env.SQL_CONNECTION);
+  await client.connect();
+  return client;
+}
+export async function query<T>(
+  query: string,
+  params: any[] = []
+): Promise<T[]> {
+  const client = await getClient();
+  try {
+    const result: QueryResult<T> = await client.query(query, params);
+    return result.rows; 
+  } catch (error) {
+    console.error("Database query error:", error);
+    throw error; 
+  } finally {
+    await client.end();
+  }
+}

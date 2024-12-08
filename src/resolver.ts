@@ -1,4 +1,5 @@
 // import { searchLibrary } from "./services/octokitService";
+import { searchLibrary } from "./services/octokitService";
 import { repositoryService } from "./services/repositoryService";
 
 const resolvers = {
@@ -19,11 +20,9 @@ const resolvers = {
       let searchRepo = await repositoryService.searchRepositoryByName(
         args.search
       );
-      console.log("searchRepo", searchRepo);
-      // if (!searchRepo.length) {
-      //   searchRepo = searchLibrary(args.search);
-      //   console.log("searchRepo", searchRepo);
-      // }
+      if (!searchRepo?.length) {
+        searchRepo = await searchLibrary(args.search);
+      }
       return searchRepo;
     },
     async userRepositoriesByUserId(_: unknown, args: { user_id: string }) {

@@ -13,7 +13,8 @@
   "description": "",
   "dependencies": {
     "@apollo/server": "^4.11.2",
-    "@octokit/graphql": "^8.1.1",
+    "@octokit/graphql": "7.0.2",
+    "@types/pg": "^8.11.10",
     "dotenv": "^16.4.7",
     "graphql": "^16.9.0",
     "pg": "^8.13.1",
