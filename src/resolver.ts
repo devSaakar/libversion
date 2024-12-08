@@ -1,4 +1,5 @@
-import { repositoryService } from "./repositoryService";
+// import { searchLibrary } from "./services/octokitService";
+import { repositoryService } from "./services/repositoryService";
 
 const resolvers = {
   Query: {
@@ -14,8 +15,16 @@ const resolvers = {
     async repository(_: unknown, args: { id: string }) {
       return await repositoryService.getRepositoryById(args.id);
     },
-    async seachRepository(_: unknown, args: { search: string }) {
-      return await repositoryService.searchRepositoryByName(args.search);
+    async searchRepository(_: unknown, args: { search: string }) {
+      let searchRepo = await repositoryService.searchRepositoryByName(
+        args.search
+      );
+      console.log("searchRepo", searchRepo);
+      // if (!searchRepo.length) {
+      //   searchRepo = searchLibrary(args.search);
+      //   console.log("searchRepo", searchRepo);
+      // }
+      return searchRepo;
     },
     async userRepositoriesByUserId(_: unknown, args: { user_id: string }) {
       return await repositoryService.getUserRepositoriesByUserId(args.user_id);
@@ -43,6 +52,15 @@ const resolvers = {
     },
     async addRepository(_: unknown, args: { repo: any }) {
       return await repositoryService.addRepository(args.repo);
+    },
+    async addUserRepository(_: unknown, args: { userRepo: any }) {
+      return await repositoryService.addUserRepository(args.userRepo);
+    },
+    async removeUserRepository(_: unknown, args: { userRepo: any }) {
+      return await repositoryService.removeUserRepository(args.userRepo);
+    },
+    async addUser(_: unknown, args: { user: any }) {
+      return await repositoryService.addUser(args.user);
     },
     async updateRepository(_: unknown, args: { id: string; edits: any }) {
       return await repositoryService.updateRepository(args.id, args.edits);

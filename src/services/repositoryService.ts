@@ -1,4 +1,4 @@
-import { query } from "./db";
+import { query } from "../db";
 
 export const repositoryService = {
   async getAllUsers() {
@@ -61,6 +61,69 @@ export const repositoryService = {
     const result = await query(
       "INSERT INTO repositories (name, version, description, release_notes, status) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [name, version, description, releaseNotes, status || "ACTIVE"]
+    );
+    return result.rows[0];
+  },
+  async addUserRepository(userRepo: any) {
+    const { user_id, repository_id } = userRepo;
+    // Check if the repository already exists by name
+
+    const existingRepo = await query(
+      "SELECT * FROM user_repositories WHERE user_id = $1 AND repository_id = $2",
+      [user_id, repository_id]
+    );
+
+    if (existingRepo.rows.length > 0) {
+      return existingRepo.rows[0];
+    }
+
+    // If repository doesn't exist, create a new one
+    const result = await query(
+      "INSERT INTO user_repositories (user_id,repository_id) VALUES ($1, $2) RETURNING *",
+      [user_id, repository_id]
+    );
+    return result.rows[0];
+  },
+  async removeUserRepository(userRepo: any) {
+    const { user_id, repository_id } = userRepo;
+
+    // Check if the repository exists for the user
+    const existingRepo = await query(
+      "SELECT * FROM user_repositories WHERE user_id = $1 AND repository_id = $2",
+      [user_id, repository_id]
+    );
+
+    if (existingRepo.rows.length === 0) {
+      // If repository doesn't exist, return a message or null
+      return { message: "Repository not found for this user" };
+    }
+
+    // If repository exists, delete it
+    const result = await query(
+      "DELETE FROM user_repositories WHERE user_id = $1 AND repository_id = $2 RETURNING *",
+      [user_id, repository_id]
+    );
+
+    // Return the deleted entry or any relevant information
+    return result.rows[0] || { message: "No rows affected" };
+  },
+  async addUser(user: any) {
+    const { username } = user;
+    // Check if the repository already exists by name
+    const existingRepo = await query(
+      "SELECT * FROM users WHERE username = $1",
+      [username]
+    );
+
+    if (existingRepo.rows.length > 0) {
+      // Return the existing repository if found
+      return existingRepo.rows[0];
+    }
+
+    // If repository doesn't exist, create a new one
+    const result = await query(
+      "INSERT INTO users (username) VALUES ($1) RETURNING *",
+      [username]
     );
     return result.rows[0];
   },
