@@ -15,7 +15,7 @@ const convertRepositoryData = (data: any, index: number): Repository => {
   const { node } = data;
 
   // Extracting relevant fields from the node object
-  const id = index + "";
+  const id = node.id;
   const name = node.name;
   const description = node.description;
   const version =
@@ -39,6 +39,7 @@ export const searchLibrary = async (libraryName: string): Promise<any[]> => {
         edges {
           node {
             ... on Repository {
+              id
               name
               description
               url

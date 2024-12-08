@@ -22,6 +22,9 @@ const resolvers = {
       );
       if (!searchRepo?.length) {
         searchRepo = await searchLibrary(args.search);
+        searchRepo.forEach(async (repo) => {
+          await repositoryService.addRepository(repo);
+        });
       }
       return searchRepo;
     },

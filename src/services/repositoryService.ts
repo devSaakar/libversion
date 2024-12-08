@@ -44,7 +44,7 @@ export const repositoryService = {
     await query("DELETE FROM user_repositories WHERE id = $1", [id]);
   },
   async addRepository(repo: any) {
-    const { name, version, description, releaseNotes, status } = repo;
+    const { id, name, version, description, releaseNotes, status } = repo;
     console.log("REPO", repo);
     // Check if the repository already exists by name
     const existingRepo = await query(
@@ -59,8 +59,8 @@ export const repositoryService = {
 
     // If repository doesn't exist, create a new one
     const result = await query(
-      "INSERT INTO repositories (name, version, description, release_notes, status) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [name, version, description, releaseNotes, status || "ACTIVE"]
+      "INSERT INTO repositories (id, name, version, description, release_notes, status) VALUES ($1, $2, $3, $4, $5,$6) RETURNING *",
+      [id, name, version, description, releaseNotes, status || "ACTIVE"]
     );
     return result[0];
   },
