@@ -11,6 +11,7 @@ export const typeDefs = `#graphql
   type User {
     id: ID!
     username: String!
+    email_id: String!
   }
 
   type UserRepository {
