@@ -1,13 +1,4 @@
-import { Pool } from "pg";
 import { getClient } from "./db";
-
-export const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: Number(process.env.DB_PORT),
-});
 
 export const createTables = async () => {
   const client = await getClient();
@@ -42,10 +33,23 @@ export const createTables = async () => {
         );
     `;
 
+    const createUserSessionTable = `
+    CREATE TABLE IF NOT EXISTS user_sessions (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    session_token VARCHAR(255) UNIQUE NOT NULL,
+    ip VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    status  VARCHAR(10) NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE')) DEFAULT 'ACTIVE'
+);
+    `;
+
     // Execute table creation queries
     await client.query(createRepositoriesTable);
     await client.query(createUsersTable);
     await client.query(createUserRepositoriesTable);
+    await client.query(createUserSessionTable);
 
     console.log("All tables checked and created if not present.");
   } catch (error) {
