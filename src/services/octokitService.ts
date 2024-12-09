@@ -1,7 +1,14 @@
 import { graphql } from "@octokit/graphql";
 import * as dotenv from "dotenv";
-import { Repository } from "../_db";
 dotenv.config();
+interface Repository {
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  release_notes: string;
+  status: "ACTIVE" | "INACTIVE";
+}
 
 const octokit = (graphql as any).defaults({
   headers: {

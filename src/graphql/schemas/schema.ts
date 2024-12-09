@@ -36,8 +36,8 @@ export const typeDefs = `#graphql
     removeUserRepository(userRepo: RemoveUserRepositoryInput): UserRepository!
     addUser(user: AddUserInput): User!
     updateRepository(id: ID!, edits: UpdateRepositoryInput): Repository
-    deleteRepository(id: ID!): [Repository]
-    deleteUserRepository(id: ID!): [UserRepository]
+    deleteRepository(id: ID!): String
+    deleteUserRepository(id: ID!): String
   }
 
   input AddRepositoryInput {

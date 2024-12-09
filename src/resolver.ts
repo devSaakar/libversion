@@ -1,29 +1,30 @@
-// import { searchLibrary } from "./services/octokitService";
 import {
   searchByUrl,
   searchLibrary,
   stringMatchGithubUrl,
 } from "./services/octokitService";
-import { repositoryService } from "./services/repositoryService";
+import {
+  UserRepository,
+  Repository,
+  UserRepositoriesRepository,
+} from "./repositories";
 
 const resolvers = {
   Query: {
     async users() {
-      return await repositoryService.getAllUsers();
+      return await UserRepository.getAllUsers();
     },
     async user(_: unknown, args: { id: string }) {
-      return await repositoryService.getUserById(args.id);
+      return await UserRepository.getUserById(args.id);
     },
     async repositories() {
-      return await repositoryService.getAllRepositories();
+      return await Repository.getAllRepositories();
     },
     async repository(_: unknown, args: { id: string }) {
-      return await repositoryService.getRepositoryById(args.id);
+      return await Repository.getRepositoryById(args.id);
     },
     async searchRepository(_: unknown, args: { search: string }) {
-      let searchRepo = await repositoryService.searchRepositoryByName(
-        args.search
-      );
+      let searchRepo = await Repository.searchRepositoryByName(args.search);
       if (!searchRepo?.length) {
         if (stringMatchGithubUrl(args.search)) {
           searchRepo = await searchByUrl(args.search);
@@ -34,7 +35,7 @@ const resolvers = {
         if (searchRepo?.length) {
           await Promise.all(
             searchRepo.map(async (repo) => {
-              await repositoryService.addRepository(repo);
+              await Repository.addRepository(repo);
             })
           );
         }
@@ -43,43 +44,45 @@ const resolvers = {
       return searchRepo;
     },
     async userRepositoriesByUserId(_: unknown, args: { user_id: string }) {
-      return await repositoryService.getUserRepositoriesByUserId(args.user_id);
+      return await UserRepositoriesRepository.getUserRepositoriesByUserId(
+        args.user_id
+      );
     },
     async userRepository(_: unknown, args: { id: string }) {
-      return await repositoryService.getUserRepositoryById(args.id);
+      return await UserRepositoriesRepository.getUserRepositoryById(args.id);
     },
   },
   UserRepository: {
     async user(parent: any) {
-      return await repositoryService.getUserById(parent.user_id);
+      return await UserRepository.getUserById(parent.user_id);
     },
     async repository(parent: any) {
-      return await repositoryService.getRepositoryById(parent.repository_id);
+      return await Repository.getRepositoryById(parent.repository_id);
     },
   },
   Mutation: {
     async deleteRepository(_: unknown, args: { id: string }) {
-      await repositoryService.deleteRepository(args.id);
-      return await repositoryService.getAllRepositories();
+      return await Repository.deleteRepository(args.id);
     },
     async deleteUserRepository(_: unknown, args: { id: string }) {
-      await repositoryService.deleteUserRepository(args.id);
-      return await repositoryService.getAllUserRepositories();
+      return await UserRepositoriesRepository.deleteUserRepository(args.id);
     },
     async addRepository(_: unknown, args: { repo: any }) {
-      return await repositoryService.addRepository(args.repo);
+      return await Repository.addRepository(args.repo);
     },
     async addUserRepository(_: unknown, args: { userRepo: any }) {
-      return await repositoryService.addUserRepository(args.userRepo);
+      return await UserRepositoriesRepository.addUserRepository(args.userRepo);
     },
     async removeUserRepository(_: unknown, args: { userRepo: any }) {
-      return await repositoryService.removeUserRepository(args.userRepo);
+      return await UserRepositoriesRepository.removeUserRepository(
+        args.userRepo
+      );
     },
     async addUser(_: unknown, args: { user: any }) {
-      return await repositoryService.addUser(args.user);
+      return await UserRepository.addUser(args.user);
     },
     async updateRepository(_: unknown, args: { id: string; edits: any }) {
-      return await repositoryService.updateRepository(args.id, args.edits);
+      return await Repository.updateRepository(args.id, args.edits);
     },
   },
 };
