@@ -32,7 +32,7 @@ export const createTables = async () => {
     const createUserRepositoriesTable = `
       CREATE TABLE IF NOT EXISTS user_repositories (
         id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users(id),
+        user_id VARCHAR(255) REFERENCES users(id),
         repository_id VARCHAR(255) REFERENCES repositories(id),
         user_repository_version VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

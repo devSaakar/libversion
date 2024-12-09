@@ -66,6 +66,8 @@ export const typeDefs = `#graphql
   }
 
   input AddUserInput {
+    id: ID!
+    email_id: String!
     username: String!
   }
 
