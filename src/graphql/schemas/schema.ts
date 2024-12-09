@@ -33,6 +33,7 @@ export const typeDefs = `#graphql
   type Mutation {
     addRepository(repo: AddRepositoryInput): Repository!
     addUserRepository(userRepo: AddUserRepositoryInput): UserRepository!
+    updateUserRepository(id: ID!,edits: EditUserRepositoryInput!): UserRepository!
     removeUserRepository(userRepo: RemoveUserRepositoryInput): UserRepository!
     addUser(user: AddUserInput): User!
     updateRepository(id: ID!, edits: UpdateRepositoryInput): Repository
@@ -42,15 +43,18 @@ export const typeDefs = `#graphql
 
   input AddRepositoryInput {
     name: String!
-    version: String
-    description: String
-    release_notes: String
-    status: String
+    version: String!
+    description: String!
+    release_notes: String!
+    status: String!
   }
 
   input AddUserRepositoryInput {
     repository_id: ID!
     user_id: ID!
+    user_repository_version: String!
+  }
+  input EditUserRepositoryInput {
     user_repository_version: String!
   }
 

@@ -36,6 +36,14 @@ const userRepositoriesRepository = {
     );
     return result[0];
   },
+  async updateUserRepository(id: string, edits: any) {
+    const { user_repository_version } = edits;
+    const res = await query(
+      "UPDATE user_repositories SET user_repository_version = $1 WHERE id = $2 RETURNING *",
+      [user_repository_version, id]
+    );
+    return res[0];
+  },
   async removeUserRepository(userRepo: any) {
     const { user_id, repository_id } = userRepo;
 

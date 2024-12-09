@@ -73,6 +73,12 @@ const resolvers = {
     async addUserRepository(_: unknown, args: { userRepo: any }) {
       return await UserRepositoriesRepository.addUserRepository(args.userRepo);
     },
+    async updateUserRepository(_: unknown, args: { id: string; edits: any }) {
+      return await UserRepositoriesRepository.updateUserRepository(
+        args.id,
+        args.edits
+      );
+    },
     async removeUserRepository(_: unknown, args: { userRepo: any }) {
       return await UserRepositoriesRepository.removeUserRepository(
         args.userRepo
