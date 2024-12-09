@@ -1,5 +1,9 @@
 // import { searchLibrary } from "./services/octokitService";
-import { searchLibrary } from "./services/octokitService";
+import {
+  searchByUrl,
+  searchLibrary,
+  stringMatchGithubUrl,
+} from "./services/octokitService";
 import { repositoryService } from "./services/repositoryService";
 
 const resolvers = {
@@ -21,10 +25,20 @@ const resolvers = {
         args.search
       );
       if (!searchRepo?.length) {
-        searchRepo = await searchLibrary(args.search);
-        searchRepo?.forEach(async (repo) => {
-          await repositoryService.addRepository(repo);
-        });
+        if (stringMatchGithubUrl(args.search)) {
+          searchRepo = await searchByUrl(args.search);
+        } else {
+          searchRepo = await searchLibrary(args.search);
+        }
+
+        if (searchRepo?.length) {
+          await Promise.all(
+            searchRepo.map(async (repo) => {
+              await repositoryService.addRepository(repo);
+            })
+          );
+        }
+        console.log("searchRepo", searchRepo);
       }
       return searchRepo;
     },
