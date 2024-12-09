@@ -20,13 +20,13 @@ const convertRepositoryData = (data: any): Repository => {
     data.releases.nodes.length > 0
       ? data.releases.nodes[0].tagName // If releases exist, set version to the latest release's name
       : "N/A"; // If no releases, set version to "N/A"
-  const releaseNotes =
+  const release_notes =
     data.releases.nodes.length > 0
       ? data.releases.nodes[0].description || "No release notes available"
       : "No release notes available"; // If no releases, set default release notes message
   const status = "ACTIVE";
 
-  return { id, name, version, description, releaseNotes, status };
+  return { id, name, version, description, release_notes, status };
 };
 
 export const searchLibrary = async (libraryName: string): Promise<any[]> => {

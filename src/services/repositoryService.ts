@@ -15,6 +15,8 @@ export const repositoryService = {
   },
   async getRepositoryById(id: string) {
     const res = await query("SELECT * FROM repositories WHERE id = $1", [id]);
+
+    console.log("res getRepositoryById", res);
     return res[0];
   },
   async searchRepositoryByName(search: string) {
@@ -44,7 +46,7 @@ export const repositoryService = {
     await query("DELETE FROM user_repositories WHERE id = $1", [id]);
   },
   async addRepository(repo: any) {
-    const { id, name, version, description, releaseNotes, status } = repo;
+    const { id, name, version, description, release_notes, status } = repo;
     console.log("REPO", repo);
     // Check if the repository already exists by name
     const existingRepo = await query(
@@ -60,12 +62,12 @@ export const repositoryService = {
     // If repository doesn't exist, create a new one
     const result = await query(
       "INSERT INTO repositories (id, name, version, description, release_notes, status) VALUES ($1, $2, $3, $4, $5,$6) RETURNING *",
-      [id, name, version, description, releaseNotes, status || "ACTIVE"]
+      [id, name, version, description, release_notes, status || "ACTIVE"]
     );
     return result[0];
   },
   async addUserRepository(userRepo: any) {
-    const { user_id, repository_id } = userRepo;
+    const { user_id, repository_id,user_repository_version } = userRepo;
     // Check if the repository already exists by name
 
     const existingRepo = await query(
@@ -79,8 +81,8 @@ export const repositoryService = {
 
     // If repository doesn't exist, create a new one
     const result = await query(
-      "INSERT INTO user_repositories (user_id,repository_id) VALUES ($1, $2) RETURNING *",
-      [user_id, repository_id]
+      "INSERT INTO user_repositories (user_id,repository_id,user_repository_version) VALUES ($1, $2,$3) RETURNING *",
+      [user_id, repository_id,user_repository_version]
     );
     return result[0];
   },
@@ -128,10 +130,10 @@ export const repositoryService = {
     return result[0];
   },
   async updateRepository(id: string, edits: any) {
-    const { name, version, description, releaseNotes, status } = edits;
+    const { name, version, description, release_notes, status } = edits;
     const res = await query(
       "UPDATE repositories SET name = $1, version = $2, description = $3, release_notes = $4, status = $5 WHERE id = $6 RETURNING *",
-      [name, version, description, releaseNotes, status, id]
+      [name, version, description, release_notes, status, id]
     );
     return res[0];
   },

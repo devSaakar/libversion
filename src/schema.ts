@@ -4,7 +4,7 @@ export const typeDefs = `#graphql
     name: String!
     version: String
     description: String
-    releaseNotes: String
+    release_notes: String
     status: String
   }
 
@@ -17,6 +17,7 @@ export const typeDefs = `#graphql
     id: ID!
     user: User!
     repository: Repository!
+    user_repository_version: String!
   }
 
   type Query {
@@ -43,13 +44,14 @@ export const typeDefs = `#graphql
     name: String!
     version: String
     description: String
-    releaseNotes: String
+    release_notes: String
     status: String
   }
 
   input AddUserRepositoryInput {
     repository_id: ID!
     user_id: ID!
+    user_repository_version: String!
   }
 
   input RemoveUserRepositoryInput {
@@ -65,7 +67,7 @@ export const typeDefs = `#graphql
     name: String
     version: String
     description: String
-    releaseNotes: String
+    release_notes: String
     status: String
   }
 `;

@@ -37,8 +37,9 @@ export const createTables = async () => {
       CREATE TABLE IF NOT EXISTS user_repositories (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
-        repository_id VARCHAR(255) REFERENCES repositories(id)
-      );
+        repository_id VARCHAR(255) REFERENCES repositories(id),
+        user_repository_version VARCHAR(255)
+        );
     `;
 
     // Execute table creation queries
