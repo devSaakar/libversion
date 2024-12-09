@@ -2,12 +2,12 @@ import {
   searchByUrl,
   searchLibrary,
   stringMatchGithubUrl,
-} from "./services/octokitService";
+} from "../../services/octokitService";
 import {
   UserRepository,
   Repository,
   UserRepositoriesRepository,
-} from "./repositories";
+} from "../../repositories";
 
 const resolvers = {
   Query: {

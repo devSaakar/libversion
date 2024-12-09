@@ -2,7 +2,7 @@ import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 
 import { typeDefs } from "./graphql/schemas/schema";
-import resolvers from "./resolver";
+import resolvers from "./graphql/resolvers/resolver";
 import { createTables } from "./db/initDB";
 
 // server setup
