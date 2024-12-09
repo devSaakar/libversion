@@ -1,4 +1,5 @@
 import {
+  searchByRepositoryId,
   searchByUrl,
   searchLibrary,
   stringMatchGithubUrl,
@@ -8,6 +9,7 @@ import {
   Repository,
   UserRepositoriesRepository,
 } from "../../repositories";
+import { Repository as RepositoryType } from "../../repositories/Repository";
 
 const resolvers = {
   Query: {
@@ -34,12 +36,11 @@ const resolvers = {
 
         if (searchRepo?.length) {
           await Promise.all(
-            searchRepo.map(async (repo) => {
+            searchRepo.map(async (repo: RepositoryType) => {
               await Repository.addRepository(repo);
             })
           );
         }
-        console.log("searchRepo", searchRepo);
       }
       return searchRepo;
     },
@@ -89,6 +90,14 @@ const resolvers = {
     },
     async updateRepository(_: unknown, args: { id: string; edits: any }) {
       return await Repository.updateRepository(args.id, args.edits);
+    },
+    async updateRepositoryById(_: unknown, args: { id: string }) {
+      const latestRepo = await searchByRepositoryId(args.id);
+      const currentRepo = await Repository.getRepositoryById(args.id);
+      if (currentRepo.version !== latestRepo.version) {
+        await await Repository.updateRepository(args.id, latestRepo);
+      }
+      return latestRepo;
     },
   },
 };

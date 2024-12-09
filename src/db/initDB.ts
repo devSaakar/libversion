@@ -13,14 +13,18 @@ export const createTables = async () => {
         version VARCHAR(50),
         description TEXT,
         release_notes TEXT,
-        status VARCHAR(50) DEFAULT 'ACTIVE'
+        status VARCHAR(50) DEFAULT 'ACTIVE',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
       );
     `;
 
     const createUsersTable = `
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
-        username VARCHAR(255) NOT NULL
+        username VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
       );
     `;
 
@@ -29,7 +33,9 @@ export const createTables = async () => {
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
         repository_id VARCHAR(255) REFERENCES repositories(id),
-        user_repository_version VARCHAR(255)
+        user_repository_version VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
         );
     `;
 

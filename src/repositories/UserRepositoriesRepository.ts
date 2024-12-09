@@ -2,7 +2,7 @@ import { query } from "../db/db";
 const userRepositoriesRepository = {
   async getUserRepositoriesByUserId(user_id: string) {
     const res = await query(
-      "SELECT * FROM user_repositories WHERE user_id = $1",
+      "SELECT * FROM user_repositories WHERE user_id = $1 ORDER BY updated_at DESC",
       [user_id]
     );
     return res;
@@ -39,7 +39,7 @@ const userRepositoriesRepository = {
   async updateUserRepository(id: string, edits: any) {
     const { user_repository_version } = edits;
     const res = await query(
-      "UPDATE user_repositories SET user_repository_version = $1 WHERE id = $2 RETURNING *",
+      "UPDATE user_repositories SET user_repository_version = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *",
       [user_repository_version, id]
     );
     return res[0];

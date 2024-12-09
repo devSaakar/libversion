@@ -1,8 +1,17 @@
 import { query } from "../db/db";
+
+export interface Repository {
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  release_notes: string;
+  status: "ACTIVE" | "INACTIVE";
+}
+
 const repositoryService = {
-  async addRepository(repo: any) {
+  async addRepository(repo: Repository) {
     const { id, name, version, description, release_notes, status } = repo;
-    console.log("REPO", repo);
     // Check if the repository already exists by name
     const existingRepo = await query(
       "SELECT * FROM repositories WHERE name = $1",
@@ -25,11 +34,10 @@ const repositoryService = {
     const res = await query("SELECT * FROM repositories");
     return res;
   },
-  async getRepositoryById(id: string) {
+  async getRepositoryById(id: string): Promise<Repository> {
     const res = await query("SELECT * FROM repositories WHERE id = $1", [id]);
 
-    console.log("res getRepositoryById", res);
-    return res[0];
+    return res[0] as Repository;
   },
   async searchRepositoryByName(search: string) {
     const res = await query(
@@ -42,7 +50,7 @@ const repositoryService = {
   async updateRepository(id: string, edits: any) {
     const { name, version, description, release_notes, status } = edits;
     const res = await query(
-      "UPDATE repositories SET name = $1, version = $2, description = $3, release_notes = $4, status = $5 WHERE id = $6 RETURNING *",
+      "UPDATE repositories SET name = $1, version = $2, description = $3, release_notes = $4, status = $5, updated_at = CURRENT_TIMESTAMP WHERE id = $6 RETURNING *",
       [name, version, description, release_notes, status, id]
     );
     return res[0];

@@ -1,14 +1,7 @@
 import { graphql } from "@octokit/graphql";
 import * as dotenv from "dotenv";
+import { Repository } from "../repositories/Repository";
 dotenv.config();
-interface Repository {
-  id: string;
-  name: string;
-  version: string;
-  description: string;
-  release_notes: string;
-  status: "ACTIVE" | "INACTIVE";
-}
 
 const octokit = (graphql as any).defaults({
   headers: {
@@ -89,10 +82,6 @@ export const searchLibrary = async (libraryName: string): Promise<any[]> => {
       console.log(`No repositories found for query: "${libraryName}"`);
       return;
     } else {
-      console.log(
-        "response.search.edges",
-        JSON.stringify(response.search.edges)
-      );
       const repositories = response.search.edges.map((data: any) =>
         convertRepositoryData(data.node)
       );
@@ -162,13 +151,67 @@ export const searchByUrl = async (repoUrl: string): Promise<any[]> => {
       name,
     });
 
-    console.log("response", response);
-
     if (!response?.repository) {
       return;
     } else {
       const repositories = convertRepositoryData(response.repository);
       return [repositories];
+    }
+  } catch (error: any) {
+    console.error(`Error: ${error.message}`);
+  }
+};
+
+export const searchByRepositoryId = async (id: string): Promise<any> => {
+  const gqlQuery = `
+  query($id: ID!) {
+    node(id: $id) {
+      ... on Repository {
+        id
+        name
+        description
+        url
+        stargazerCount
+        forkCount
+        owner {
+          login
+        }
+        createdAt
+        updatedAt
+        releases(first: 1, orderBy: { field: CREATED_AT, direction: DESC }) {
+          nodes {
+            name
+            tagName
+            description
+            publishedAt
+          }
+        }
+        refs(refPrefix: "refs/tags/", first: 1, orderBy: { field: TAG_COMMIT_DATE, direction: DESC }) {
+          nodes {
+            name
+            target {
+              ... on Commit {
+                committedDate
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+  try {
+    const client = await octokit;
+    const response = await client(gqlQuery, {
+      id,
+    });
+
+    if (!response?.node) {
+      return;
+    } else {
+      const repositories = convertRepositoryData(response.node);
+      return repositories;
     }
   } catch (error: any) {
     console.error(`Error: ${error.message}`);
