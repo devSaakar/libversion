@@ -5,7 +5,6 @@ export const createTables = async () => {
   try {
     console.log("Checking and creating tables if not exist...");
 
-    // SQL queries to create tables
     const createRepositoriesTable = `
       CREATE TABLE IF NOT EXISTS repositories (
         id VARCHAR(255) PRIMARY KEY,
@@ -43,7 +42,7 @@ export const createTables = async () => {
     const createUserSessionTable = `
     CREATE TABLE IF NOT EXISTS user_sessions (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id  VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     session_token VARCHAR(255) UNIQUE NOT NULL,
     ip VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -52,7 +51,6 @@ export const createTables = async () => {
 );
     `;
 
-    // Execute table creation queries
     await client.query(createRepositoriesTable);
     await client.query(createUsersTable);
     await client.query(createUserRepositoriesTable);

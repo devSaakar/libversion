@@ -12,18 +12,15 @@ export interface Repository {
 const repositoryService = {
   async addRepository(repo: Repository) {
     const { id, name, version, description, release_notes, status } = repo;
-    // Check if the repository already exists by name
     const existingRepo = await query(
       "SELECT * FROM repositories WHERE name = $1",
       [name]
     );
 
     if (existingRepo.length > 0) {
-      // Return the existing repository if found
       return existingRepo[0];
     }
 
-    // If repository doesn't exist, create a new one
     const result = await query(
       "INSERT INTO repositories (id, name, version, description, release_notes, status) VALUES ($1, $2, $3, $4, $5,$6) RETURNING *",
       [id, name, version, description, release_notes, status || "ACTIVE"]

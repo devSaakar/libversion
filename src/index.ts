@@ -5,7 +5,6 @@ import { typeDefs } from "./graphql/schemas/schema";
 import resolvers from "./graphql/resolvers/resolver";
 import { createTables } from "./db/initDB";
 
-// server setup
 const server = new ApolloServer({
   typeDefs,
   resolvers,

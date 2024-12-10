@@ -12,18 +12,15 @@ const octokit = (graphql as any).defaults({
 const convertRepositoryData = (data: any): Repository => {
   // const { node } = data;
 
-  // Extracting relevant fields from the node object
   const id = data.id;
   const name = data.name;
   const description = data.description;
   const version =
-    data.releases.nodes.length > 0
-      ? data.releases.nodes[0].tagName // If releases exist, set version to the latest release's name
-      : "N/A"; // If no releases, set version to "N/A"
+    data.releases.nodes.length > 0 ? data.releases.nodes[0].tagName : "N/A";
   const release_notes =
     data.releases.nodes.length > 0
       ? data.releases.nodes[0].description || "No release notes available"
-      : "No release notes available"; // If no releases, set default release notes message
+      : "No release notes available";
   const status = "ACTIVE";
 
   return { id, name, version, description, release_notes, status };

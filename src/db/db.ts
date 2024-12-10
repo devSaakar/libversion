@@ -1,7 +1,6 @@
 import { Client, QueryResult } from "pg";
 import dotenv from "dotenv";
 
-// Load environment variables
 dotenv.config();
 
 export async function getClient() {
@@ -16,10 +15,10 @@ export async function query<T>(
   const client = await getClient();
   try {
     const result: QueryResult<T> = await client.query(query, params);
-    return result.rows; 
+    return result.rows;
   } catch (error) {
     console.error("Database query error:", error);
-    throw error; 
+    throw error;
   } finally {
     await client.end();
   }
