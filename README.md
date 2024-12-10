@@ -1,8 +1,12 @@
 # Getting Postgres DB setup
 
-In the terminal you can run to initialize sql db:
+If you want to setup sql db locally in the terminal you can run:
 
 ## `docker run --name local-4 -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres`
+
+Create .env file in root take reference from .env.sample and update the values
+
+## Create .env file
 
 In the project directory, you can run:
 
