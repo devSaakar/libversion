@@ -39,22 +39,22 @@ export const createTables = async () => {
         );
     `;
 
-    const createUserSessionTable = `
-    CREATE TABLE IF NOT EXISTS user_sessions (
-    id SERIAL PRIMARY KEY,
-    user_id  VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    session_token VARCHAR(255) UNIQUE NOT NULL,
-    ip VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    status  VARCHAR(10) NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE')) DEFAULT 'ACTIVE'
-);
-    `;
+    //     const createUserSessionTable = `
+    //     CREATE TABLE IF NOT EXISTS user_sessions (
+    //     id SERIAL PRIMARY KEY,
+    //     user_id  VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    //     session_token VARCHAR(255) UNIQUE NOT NULL,
+    //     ip VARCHAR(255) NOT NULL,
+    //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    //     expires_at TIMESTAMP NOT NULL,
+    //     status  VARCHAR(10) NOT NULL CHECK (status IN ('ACTIVE', 'INACTIVE')) DEFAULT 'ACTIVE'
+    // );
+    //     `;
 
     await client.query(createRepositoriesTable);
     await client.query(createUsersTable);
     await client.query(createUserRepositoriesTable);
-    await client.query(createUserSessionTable);
+    // await client.query(createUserSessionTable);
 
     console.log("All tables checked and created if not present.");
   } catch (error) {

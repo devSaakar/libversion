@@ -5,9 +5,18 @@ import { typeDefs } from "./graphql/schemas/schema";
 import resolvers from "./graphql/resolvers/resolver";
 import { createTables } from "./db/initDB";
 
+import cron from "node-cron";
+import { updateRepositoryData } from "./services/repositoryService";
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+});
+
+cron.schedule("0 0 * * *", async () => {
+  console.log("Starting repository data update...");
+  await updateRepositoryData();
+  console.log("Repository data update completed.");
 });
 
 const startServer = async (): Promise<void> => {

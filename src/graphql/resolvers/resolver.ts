@@ -6,7 +6,7 @@ import {
 } from "../../services/octokitService";
 import {
   UserRepository,
-  Repository,
+  RepositoriesRepository,
   UserRepositoriesRepository,
 } from "../../repositories";
 import { Repository as RepositoryType } from "../../repositories/Repository";
@@ -20,13 +20,15 @@ const resolvers = {
       return await UserRepository.getUserById(args.id);
     },
     async repositories() {
-      return await Repository.getAllRepositories();
+      return await RepositoriesRepository.getAllRepositories();
     },
     async repository(_: unknown, args: { id: string }) {
-      return await Repository.getRepositoryById(args.id);
+      return await RepositoriesRepository.getRepositoryById(args.id);
     },
     async searchRepository(_: unknown, args: { search: string }) {
-      let searchRepo = await Repository.searchRepositoryByName(args.search);
+      let searchRepo = await RepositoriesRepository.searchRepositoryByName(
+        args.search
+      );
       if (!searchRepo?.length) {
         if (stringMatchGithubUrl(args.search)) {
           searchRepo = await searchByUrl(args.search);
@@ -37,7 +39,7 @@ const resolvers = {
         if (searchRepo?.length) {
           await Promise.all(
             searchRepo.map(async (repo: RepositoryType) => {
-              await Repository.addRepository(repo);
+              await RepositoriesRepository.addRepository(repo);
             })
           );
         }
@@ -58,18 +60,20 @@ const resolvers = {
       return await UserRepository.getUserById(parent.user_id);
     },
     async repository(parent: any) {
-      return await Repository.getRepositoryById(parent.repository_id);
+      return await RepositoriesRepository.getRepositoryById(
+        parent.repository_id
+      );
     },
   },
   Mutation: {
     async deleteRepository(_: unknown, args: { id: string }) {
-      return await Repository.deleteRepository(args.id);
+      return await RepositoriesRepository.deleteRepository(args.id);
     },
     async deleteUserRepository(_: unknown, args: { id: string }) {
       return await UserRepositoriesRepository.deleteUserRepository(args.id);
     },
     async addRepository(_: unknown, args: { repo: any }) {
-      return await Repository.addRepository(args.repo);
+      return await RepositoriesRepository.addRepository(args.repo);
     },
     async addUserRepository(_: unknown, args: { userRepo: any }) {
       return await UserRepositoriesRepository.addUserRepository(args.userRepo);
@@ -89,13 +93,18 @@ const resolvers = {
       return await UserRepository.addUser(args.user);
     },
     async updateRepository(_: unknown, args: { id: string; edits: any }) {
-      return await Repository.updateRepository(args.id, args.edits);
+      return await RepositoriesRepository.updateRepository(args.id, args.edits);
     },
     async updateRepositoryById(_: unknown, args: { id: string }) {
       const latestRepo = await searchByRepositoryId(args.id);
-      const currentRepo = await Repository.getRepositoryById(args.id);
+      const currentRepo = await RepositoriesRepository.getRepositoryById(
+        args.id
+      );
       if (currentRepo.version !== latestRepo.version) {
-        await await Repository.updateRepository(args.id, latestRepo);
+        await await RepositoriesRepository.updateRepository(
+          args.id,
+          latestRepo
+        );
       }
       return latestRepo;
     },

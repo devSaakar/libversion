@@ -28,7 +28,7 @@ const repositoryService = {
     return result[0];
   },
   async getAllRepositories() {
-    const res = await query("SELECT * FROM repositories");
+    const res: Repository[] = await query("SELECT * FROM repositories");
     return res;
   },
   async getRepositoryById(id: string): Promise<Repository> {
